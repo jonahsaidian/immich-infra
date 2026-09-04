@@ -1,0 +1,50 @@
+services:
+  immich-server:
+    image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION}
+    volumes:
+      - ${IMMICH_LIBRARY_PATH}:/usr/src/app/upload
+      - /etc/localtime:/etc/localtime:ro
+    # Uncomment to enable Quick Sync hardware video transcoding on the
+    # EliteDesk's integrated GPU (verify /dev/dri exists on the host first):
+    # devices:
+    #   - /dev/dri:/dev/dri
+    env_file:
+      - .env
+    expose:
+      - "2283"
+    networks:
+      - default
+      - edge
+    depends_on:
+      - redis
+      - postgres
+    restart: unless-stopped
+
+  immich-machine-learning:
+    image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION}
+    volumes:
+      - model-cache:/cache
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  redis:
+    image: redis:6.2-alpine
+    restart: unless-stopped
+
+  postgres:
+    image: ghcr.io/immich-app/postgres:14-vectorchord0.3.0-pgvectors0.2.0
+    environment:
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_DATABASE_NAME}
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+networks:
+  edge:
+    external: true
+
+volumes:
+  model-cache:

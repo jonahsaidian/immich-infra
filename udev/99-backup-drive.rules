@@ -1,0 +1,11 @@
+# PHASE 2 -- not active until the second backup HDD exists.
+#
+# Replace REPLACE_WITH_BACKUP_DRIVE_UUID below with the second drive's
+# filesystem UUID (`sudo blkid` after formatting it), then install:
+#   sudo cp 99-backup-drive.rules /etc/udev/rules.d/
+#   sudo udevadm control --reload-rules
+#
+# On plug-in, mounts the drive at /mnt/photos-backup and kicks off the
+# restic backup service.
+ACTION=="add", ENV{ID_FS_UUID}=="REPLACE_WITH_BACKUP_DRIVE_UUID", \
+  RUN+="/usr/bin/systemctl start immich-backup.service"

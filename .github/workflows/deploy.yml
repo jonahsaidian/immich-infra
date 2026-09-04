@@ -1,0 +1,27 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # .env is gitignored and lives only in this runner's working
+          # copy on the server -- don't let checkout wipe it.
+          clean: false
+
+      - name: Verify library drive is mounted
+        run: |
+          set -a
+          source .env
+          set +a
+          ./scripts/check-library-mount.sh
+
+      - name: Deploy stack
+        run: |
+          docker compose pull
+          docker compose up -d --remove-orphans

@@ -1,0 +1,20 @@
+# PHASE 2 -- not active until the second backup HDD exists.
+#
+# Expects an /etc/fstab entry for the backup drive with `noauto` (mounted
+# on demand by this unit, not at boot):
+#   UUID=<backup-drive-uuid>  /mnt/photos-backup  ext4  noauto,nofail  0  2
+#
+# Install:
+#   sudo cp immich-backup.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+
+[Unit]
+Description=One-shot backup of the Immich library to the secondary drive
+Requires=docker.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/immich-backup-env
+ExecStartPre=/usr/bin/mount /mnt/photos-backup
+ExecStart=/opt/immich-infra/scripts/backup-to-secondary.sh
+ExecStopPost=/usr/bin/umount /mnt/photos-backup
