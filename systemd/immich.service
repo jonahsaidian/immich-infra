@@ -1,22 +1,22 @@
 [Unit]
-Description=Immich stack (docker compose)
-Requires=docker.service
-After=docker.service network-online.target
+Description=Immich photo server (gated on external photo drive)
+Documentation=https://github.com/jonahsaidian/immich-infra
+Requires=docker.service mnt-photos.mount
+After=docker.service mnt-photos.mount network-online.target
 Wants=network-online.target
-RequiresMountsFor=/mnt/photos
 StartLimitIntervalSec=0
 
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-WorkingDirectory=/opt/immich-infra
-EnvironmentFile=/opt/immich-infra/.env
-ExecStartPre=/opt/immich-infra/scripts/check-library-mount.sh
+WorkingDirectory=/home/jonah/immich-infra
+# Mount-guard: refuse to start unless the external drive is mounted.
+# The canary proves it is *our* drive, not an empty mountpoint.
+ExecStartPre=/usr/bin/test -f /mnt/photos/.immich-library-marker
 ExecStart=/usr/bin/docker compose up -d --remove-orphans
 ExecStop=/usr/bin/docker compose down
-# If the drive isn't mounted yet, the pre-check fails and systemd retries
-# every 30s indefinitely (StartLimitIntervalSec=0 disables the burst
-# limit) -- this is the "wait for the drive" behavior, not a one-shot fail.
+TimeoutStartSec=180
+# If the drive isn't there yet, retry every 30s until it appears.
 Restart=on-failure
 RestartSec=30
 
