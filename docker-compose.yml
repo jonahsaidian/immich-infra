@@ -12,6 +12,11 @@ services:
       - .env
     expose:
       - "2283"
+    # Published on the host so large uploads can bypass Cloudflare's 100MB
+    # per-request cap by going direct over the tailnet/LAN
+    # (http://100.103.221.38:2283). Same Immich, same library.
+    ports:
+      - "2283:2283"
     networks:
       - default
       - edge
