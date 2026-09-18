@@ -70,6 +70,7 @@ has a placeholder UUID.
   never bump it on its own — bumping the pin is also the security-patch
   checkpoint. There's no automated reminder for this yet (candidate:
   Dependabot/Renovate on the `.env` pin), it's currently a manual TODO.
+- **Upgraded v1.118.2 to v3.2.2 on 2026-09-18**: the old pin was stale (v1.118.2 dates to ~Oct 2024), not a deliberate choice. Library and DB were still empty, so this was a fresh-DB redeploy rather than an in-place migration. v3 compose conventions now in use: library mounts at `/data` via `UPLOAD_LOCATION` (replaces `IMMICH_LIBRARY_PATH` to `/usr/src/app/upload`); DB path via `DB_DATA_LOCATION`; queue is Valkey (`docker.io/valkey/valkey:9`) but the compose service is still named `redis` so the `REDIS_HOSTNAME` default keeps resolving; postgres image `14-vectorchord0.4.3-pgvectors0.2.0` with `--data-checksums` on init and `shm_size: 128mb`. Service names (`postgres`, `redis`) kept deliberately — `DB_HOSTNAME=postgres` depends on it.
 - **Per-user isolation is native Immich behavior**, not something built
   here — each account only sees its own library; the admin account (Jonah)
   can see everything via the admin panel. Confirmed this matches what

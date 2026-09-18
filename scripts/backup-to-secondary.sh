@@ -10,7 +10,7 @@ set -euo pipefail
 # /etc/immich-backup-env file, not committed to this repo).
 : "${RESTIC_PASSWORD:?RESTIC_PASSWORD must be set}"
 
-LIBRARY_PATH="${IMMICH_LIBRARY_PATH:-/mnt/photos}"
+LIBRARY_PATH="${UPLOAD_LOCATION:-/mnt/photos}"
 BACKUP_MOUNT="${BACKUP_DRIVE_PATH:-/mnt/photos-backup}"
 RESTIC_REPO="$BACKUP_MOUNT/restic-repo"
 

@@ -11,7 +11,7 @@ home-server-infra's cloudflared --- edge network ---> immich-server (2283)
                                                              |
                                               default network (internal only)
                                                              |
-                                          immich-machine-learning, redis, postgres
+                                          immich-machine-learning, redis (Valkey), postgres
 ```
 
 `immich-server` is the only service reachable from outside this compose
@@ -29,7 +29,7 @@ internal.
 - **`scripts/check-library-mount.sh` guards every start and every deploy.**
   It refuses to proceed unless `/mnt/photos` is a real mount *and*
   contains a canary marker file (`.immich-library-marker`) that only
-  exists on the actual drive. This prevents Immich from silently writing
+  exists on the actual drive. Inside the container the library is mounted at `/data` (Immich v1.137+ convention; the mount-guard script reads the host path from `UPLOAD_LOCATION`). This prevents Immich from silently writing
   the library into an empty folder on the internal disk if the external
   drive is ever unplugged or fails to mount.
 
@@ -88,7 +88,7 @@ See `.github/workflows/deploy.yml`.
 | File | Purpose |
 |------|---------|
 | `docker-compose.yml` | immich-server, immich-machine-learning, postgres, redis |
-| `.env` | DB creds, `IMMICH_VERSION` pin, `IMMICH_LIBRARY_PATH`; gitignored, copy from `.env.example` |
+| `.env` | DB creds, `IMMICH_VERSION` pin, `UPLOAD_LOCATION`, `DB_DATA_LOCATION`; gitignored, copy from `.env.example` |
 | `scripts/check-library-mount.sh` | Mount-guard, run before every start and every deploy |
 | `systemd/immich.service` | Boot-time service with retry-until-mounted behavior |
 | `scripts/backup-to-secondary.sh`, `udev/`, `systemd/immich-backup.service` | Phase 2 backup-drive automation |

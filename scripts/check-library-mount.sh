@@ -5,7 +5,7 @@
 # "empty library" there instead of failing loudly.
 set -euo pipefail
 
-MOUNT_POINT="${IMMICH_LIBRARY_PATH:-/mnt/photos}"
+MOUNT_POINT="${UPLOAD_LOCATION:-/mnt/photos}"
 MARKER="$MOUNT_POINT/.immich-library-marker"
 
 if ! mountpoint -q "$MOUNT_POINT"; then
