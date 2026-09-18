@@ -58,6 +58,33 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now immich.service
 ```
 
+### Liveness watchdog
+
+Containers use `restart: "no"` (so systemd owns the boot order), which means
+Docker no longer restarts a crashed container on its own.
+`systemd/immich-watchdog.timer` runs `systemd/immich-watchdog.service` every
+2 minutes; the service re-runs `docker compose up -d`, which only recreates
+containers that are down. It skips entirely when `immich.service` is not
+active, and when the drive canary is absent -- so it can never resurrect the
+stack onto an empty mountpoint.
+
+```bash
+sudo cp systemd/immich-watchdog.service systemd/immich-watchdog.timer /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now immich-watchdog.timer
+```
+
+> **Maintenance warning:** if you deliberately stop the stack, stop the
+> watchdog timer first -- otherwise it will bring the stack back within
+> 2 minutes and you will wonder what is haunting the server:
+>
+> ```bash
+> sudo systemctl stop immich-watchdog.timer
+> # ... do maintenance ...
+> sudo systemctl start immich.service
+> sudo systemctl start immich-watchdog.timer
+> ```
+
 ## Backups (Phase 2 -- not active yet)
 
 `scripts/backup-to-secondary.sh`, `systemd/immich-backup.service`, and
@@ -91,4 +118,5 @@ See `.github/workflows/deploy.yml`.
 | `.env` | DB creds, `IMMICH_VERSION` pin, `UPLOAD_LOCATION`, `DB_DATA_LOCATION`; gitignored, copy from `.env.example` |
 | `scripts/check-library-mount.sh` | Mount-guard, run before every start and every deploy |
 | `systemd/immich.service` | Boot-time service with retry-until-mounted behavior |
+| `systemd/immich-watchdog.service`, `systemd/immich-watchdog.timer` | Liveness watchdog: heals crashed containers every 2min |
 | `scripts/backup-to-secondary.sh`, `udev/`, `systemd/immich-backup.service` | Phase 2 backup-drive automation |
