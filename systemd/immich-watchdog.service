@@ -1,0 +1,16 @@
+[Unit]
+Description=Immich container liveness watchdog (heals crashed containers)
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/jonah/immich-infra
+# Only heal when the stack is supposed to be up (e.g. skip when Jonah
+# deliberately stops it with `systemctl stop immich` for maintenance).
+ExecCondition=/bin/systemctl is-active --quiet immich.service
+# ...and only when the photo drive is actually mounted: never resurrect
+# containers onto an empty mountpoint.
+ExecCondition=/usr/bin/test -f /mnt/photos/.immich-library-marker
+# Idempotent: recreates only containers that are down or out of date.
+ExecStart=/usr/bin/docker compose up -d
