@@ -15,31 +15,23 @@ Full original requirements/interview and the approved plan are preserved
 at `C:\Users\jonah\.claude\plans\i-want-to-move-floating-tower.md` — read
 that for the complete picture if this file is insufficient.
 
-## Current status (as of 2026-08-26)
+## Current status (as of 2026-09-17)
 
-Scaffolded locally, **not yet committed**, **no GitHub remote created**,
-**nothing deployed to the mini PC yet**. No external HDD attached/mounted
-yet, no Immich accounts created. Jonah is reviewing the code before
-committing. See `../home-server-infra/CLAUDE.md` for the full
-migration/cutover order — this repo's part of it is roughly:
-1. Format and mount the external HDD at `/mnt/photos`, create the canary
-   marker file (`.immich-library-marker`) — see README "One-time drive
-   setup".
-2. Install `systemd/immich.service`, verify the mount-guard actually
-   blocks startup with the drive detached before relying on it.
-3. Bring the stack up, confirm `photos.jonahsaidian.com` resolves once
-   `home-server-infra`'s tunnel is routed to `immich-server` on the shared
-   `edge` network.
-4. Create the 3 family accounts, disable public self-registration, enable
-   2FA per account.
-5. Install the self-hosted GitHub Actions runner for this repo
-   specifically (separate from the one in `home-server-infra`).
+Deployed on the mini PC at Immich **v3.2.2** (upgraded from the stale v1.118.2
+pin on 2026-09-17; see the upgrade bullet under Key decisions). External HDD
+mounted at `/mnt/photos` with the canary marker file in place. The database
+is fresh and empty — no accounts exist yet; Jonah is about to re-create the
+admin account and test uploads via a temporary SSH tunnel forward.
+`photos.jonahsaidian.com` is not yet routed through the tunnel — DNS cutover
+happens together with Jonah, after his test passes. Committed and pushed to
+GitHub (`main`).
 
-The Phase 2 backup-drive automation (`scripts/backup-to-secondary.sh`,
-`udev/99-backup-drive.rules`, `systemd/immich-backup.service`) is
-scaffolded but **intentionally inert** — Jonah is sourcing the second
-drive soon. Wire it up when he says the drive exists; the udev rule still
-has a placeholder UUID.
+Still to do: create the 3 family accounts, disable public self-registration,
+enable 2FA per account; install `systemd/immich.service`; install the
+self-hosted GitHub Actions runner for this repo; verify push-to-deploy; DNS
+cutover + 24-48h monitoring, then decommission `DO_infra` together with
+Jonah. Phase 2 backup-drive automation stays inert until the second drive
+arrives (udev rule still has a placeholder UUID).
 
 ## Key decisions and why
 
