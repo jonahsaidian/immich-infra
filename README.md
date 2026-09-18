@@ -63,10 +63,11 @@ sudo systemctl enable --now immich.service
 `scripts/backup-to-secondary.sh`, `systemd/immich-backup.service`, and
 `udev/99-backup-drive.rules` scaffold an automatic backup: plugging in a
 second external HDD (matched by its filesystem UUID) triggers a `restic`
-backup of `/mnt/photos` to it. Not wired up until that second drive
-exists -- see the comments in each file for install steps at that point.
-Restic encrypts backups client-side, so adding an offsite Cloudflare R2
-copy later is a small change, not a redesign.
+backup of `/mnt/photos` to it. Not wired up yet -- Jonah is sourcing the
+second drive soon; wire it up when it arrives (see the comments in each
+file for install steps at that point). Restic encrypts backups
+client-side, so adding an offsite Cloudflare R2 copy later is a small
+change, not a redesign.
 
 ## Users
 

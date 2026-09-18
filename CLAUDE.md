@@ -37,9 +37,9 @@ migration/cutover order — this repo's part of it is roughly:
 
 The Phase 2 backup-drive automation (`scripts/backup-to-secondary.sh`,
 `udev/99-backup-drive.rules`, `systemd/immich-backup.service`) is
-scaffolded but **intentionally inert** — Jonah hasn't bought the second
-drive yet. Don't wire it up until he says the drive exists; the udev rule
-still has a placeholder UUID.
+scaffolded but **intentionally inert** — Jonah is sourcing the second
+drive soon. Wire it up when he says the drive exists; the udev rule still
+has a placeholder UUID.
 
 ## Key decisions and why
 
@@ -59,8 +59,8 @@ still has a placeholder UUID.
   network** — only `immich-server` does. Keeps the DB and ML worker
   unreachable from the tunnel/outside world even in principle.
 - **Local-only backups for now, but built on restic (not rsync).** Jonah
-  said the second backup drive and possibly Cloudflare R2 offsite backup
-  are coming later, "for now assume local only." Restic was chosen
+  is sourcing the second backup drive soon; Cloudflare R2 offsite backup
+  remains a later option. Restic was chosen
   specifically so adding an encrypted R2 target later is a small config
   change, not a redesign — restic already encrypts client-side.
 - **Disk encryption (LUKS) on the library drive: explicitly skipped** per
