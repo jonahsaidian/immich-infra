@@ -50,7 +50,12 @@ touch /mnt/photos/.immich-library-marker   # the canary check.sh looks for
 
 `systemd/immich.service` runs `docker compose up -d` only after the mount
 guard passes, and retries every 30s indefinitely if the drive isn't
-present yet (rather than failing once and staying down):
+present yet (rather than failing once and staying down). The unit uses
+`After=` for ordering but deliberately no `Requires=` on the mount: the
+canary `ExecStartPre` check is the gate, and its non-zero exit is what
+`Restart=on-failure` provably retries. A hard `Requires=` could fail the
+unit via dependency failure, which is not guaranteed to restart -- the
+exact case this unit exists to survive.
 
 ```bash
 sudo cp systemd/immich.service /etc/systemd/system/

@@ -1,7 +1,12 @@
 [Unit]
 Description=Immich photo server (gated on external photo drive)
 Documentation=https://github.com/jonahsaidian/immich-infra
-Requires=docker.service mnt-photos.mount
+# Ordering only -- deliberately no Requires= here. Every failure mode
+# (docker down, drive missing/slow) surfaces as a non-zero exit from
+# ExecStartPre/ExecStart, which Restart=on-failure provably retries.
+# A hard Requires=mnt-photos.mount could fail the unit via dependency
+# failure instead, which is not guaranteed to trigger a restart --
+# exactly the boot-without-drive case this unit exists to survive.
 After=docker.service mnt-photos.mount network-online.target
 Wants=network-online.target
 StartLimitIntervalSec=0
